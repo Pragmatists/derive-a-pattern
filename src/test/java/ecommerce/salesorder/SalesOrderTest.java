@@ -1,6 +1,8 @@
 package ecommerce.salesorder;
 
 import ecommerce.common.Country;
+import ecommerce.common.InvalidVatId;
+import ecommerce.common.VatId;
 import org.junit.Test;
 
 import static ecommerce.salesorder.LineItem.Type.*;
@@ -98,7 +100,19 @@ public class SalesOrderTest {
         int total = salesOrder.getTotal();
 
         assertThat(total).isEqualTo(370);
+    }
 
+    @Test
+    public void totalCost_whenShippingToAPersonWithoutVatIdOutsidePoland_includesVat() {
+        SalesOrder salesOrder = new SalesOrderBuilder()
+                .deliverTo(Country.GERMANY)
+                .customerWithoutVatId()
+                .withItemPriced(50)
+                .build();
+
+        int total = salesOrder.getTotal();
+
+        assertThat(total).isEqualTo(50 + 50 + 23);
     }
 
     private class SalesOrderBuilder {
@@ -107,6 +121,7 @@ public class SalesOrderTest {
 
         public SalesOrderBuilder() {
             salesOrder.deliveryCountry(Country.POLAND);
+            salesOrder.customerVatId(new VatId(Country.POLAND, "4687831721"));
         }
 
         public SalesOrderBuilder withItemPriced(int price) {
@@ -128,6 +143,11 @@ public class SalesOrderTest {
 
         public SalesOrderBuilder withItem(LineItem lineItem) {
             salesOrder.addItem(lineItem);
+            return this;
+        }
+
+        public SalesOrderBuilder customerWithoutVatId() {
+            salesOrder.customerVatId(new InvalidVatId());
             return this;
         }
     }

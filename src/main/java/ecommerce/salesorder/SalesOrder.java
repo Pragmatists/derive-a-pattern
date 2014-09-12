@@ -1,20 +1,30 @@
 package ecommerce.salesorder;
 
 import ecommerce.common.Country;
+import ecommerce.common.VatId;
 
 public class SalesOrder {
 
     private final LineItems lineItems = new LineItems();
     private Country country;
+    private VatId vatId;
 
     public void addItem(LineItem lineItem) {
         lineItems.addItem(lineItem);
     }
 
     public int getTotal() {
-        return lineItems.totalPrice()
-                +
-                shippingCost();
+        return applyVatIfNecessary(
+                lineItems.totalPrice()
+                        +
+                        shippingCost());
+    }
+
+    private int applyVatIfNecessary(int netTotal) {
+        if (vatId.isValid()) {
+            return netTotal;
+        }
+        return (int) (1.23 * netTotal);
     }
 
     private int shippingCost() {
@@ -39,5 +49,9 @@ public class SalesOrder {
 
     public void deliveryCountry(Country country) {
         this.country = country;
+    }
+
+    public void customerVatId(VatId vatId) {
+        this.vatId = vatId;
     }
 }

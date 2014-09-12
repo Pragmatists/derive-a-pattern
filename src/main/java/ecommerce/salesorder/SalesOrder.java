@@ -7,7 +7,7 @@ public class SalesOrder {
     private final LineItems lineItems = new LineItems();
     private Country country;
 
-    public void addItem(LineItem lineItem) {
+    void addItem(LineItem lineItem) {
         lineItems.addItem(lineItem);
     }
 
@@ -17,7 +17,7 @@ public class SalesOrder {
                 shippingCost();
     }
 
-    private int shippingCost() {
+    public int shippingCost() {
         if (!country.equals(Country.POLAND)) {
             if (totalWeight() > 10.0) {
                 return 70;
@@ -37,7 +37,7 @@ public class SalesOrder {
         return lineItems.totalWeight();
     }
 
-    public void deliveryCountry(Country country) {
+    void deliveryCountry(Country country) {
         this.country = country;
     }
 }

@@ -6,54 +6,31 @@ public class SalesOrder {
 
     private final LineItems lineItems = new LineItems();
     private Country country;
+    private ShippingCostStrategy shippingCostStrategy = new ShippingCostStrategy(this);
 
     void addItem(LineItem lineItem) {
         lineItems.addItem(lineItem);
     }
 
     public int getTotal() {
-        return lineItems.totalPrice()
+        return totalPrice()
                 +
-                shippingCost();
+                shippingCostStrategy.shippingCost();
     }
 
-    public int shippingCost() {
-        if (!country.equals(Country.POLAND)) {
-            return internationalShippingCost();
-        }
-        if (lineItems.onlyBooks()) {
-            return booksPromoShippingCost();
-        }
-        return standardShippingCost();
+    boolean isInternational() {
+        return !country.equals(Country.POLAND);
     }
 
-    private int standardShippingCost() {
-        return 15;
+    boolean hasOnlyBooks() {
+        return lineItems.onlyBooks();
     }
 
-    private int booksPromoShippingCost() {
-        if (eligibleForFreeBookShipping()) {
-            return 0;
-        }
-        return 5;
+    Integer totalPrice() {
+        return lineItems.totalPrice();
     }
 
-    private boolean eligibleForFreeBookShipping() {
-        return lineItems.totalPrice() > 200;
-    }
-
-    private int internationalShippingCost() {
-        if (isHeavy()) {
-            return 70;
-        }
-        return 50;
-    }
-
-    private boolean isHeavy() {
-        return totalWeight() > 10.0;
-    }
-
-    private double totalWeight() {
+    double totalWeight() {
         return lineItems.totalWeight();
     }
 

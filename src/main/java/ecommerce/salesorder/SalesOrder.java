@@ -19,18 +19,38 @@ public class SalesOrder {
 
     public int shippingCost() {
         if (!country.equals(Country.POLAND)) {
-            if (totalWeight() > 10.0) {
-                return 70;
-            }
-            return 50;
+            return internationalShippingCost();
         }
         if (lineItems.onlyBooks()) {
-            if (lineItems.totalPrice() > 200) {
-                return 0;
-            }
-            return 5;
+            return booksPromoShippingCost();
         }
+        return standardShippingCost();
+    }
+
+    private int standardShippingCost() {
         return 15;
+    }
+
+    private int booksPromoShippingCost() {
+        if (eligibleForFreeBookShipping()) {
+            return 0;
+        }
+        return 5;
+    }
+
+    private boolean eligibleForFreeBookShipping() {
+        return lineItems.totalPrice() > 200;
+    }
+
+    private int internationalShippingCost() {
+        if (isHeavy()) {
+            return 70;
+        }
+        return 50;
+    }
+
+    private boolean isHeavy() {
+        return totalWeight() > 10.0;
     }
 
     private double totalWeight() {

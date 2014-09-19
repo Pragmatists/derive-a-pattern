@@ -6,7 +6,6 @@ public class SalesOrder {
 
     private final LineItems lineItems = new LineItems();
     private Country country;
-    private ShippingCostStrategy shippingCostStrategy = new ShippingCostStrategy(this);
 
     void addItem(LineItem lineItem) {
         lineItems.addItem(lineItem);
@@ -15,7 +14,18 @@ public class SalesOrder {
     public int getTotal() {
         return totalPrice()
                 +
-                shippingCostStrategy.shippingCost();
+                createShippingCostStrategy().shippingCost();
+    }
+
+    private ShippingCostStrategy createShippingCostStrategy() {
+        if (isInternational()) {
+            return new InternationalShippingCostStrategy(this);
+        }
+        if (hasOnlyBooks()) {
+            return new BooksPromoShippingCostStrategy(this);
+        }
+
+        return new StandardShippingCostStrategy(this);
     }
 
     boolean isInternational() {

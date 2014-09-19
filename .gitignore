@@ -1,5 +1,7 @@
 bin
 obj
+.classpath
+.settings/
 .idea
 *.iml
 *.eml
